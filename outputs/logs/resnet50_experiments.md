@@ -11,7 +11,7 @@
 | **E3.5 – 强增强 + Mixup** | 叠加 RandAugment + Mixup/CutMix + Label Smoothing | `augment=basic`, `randaug_num_ops=2`, `randaug_magnitude=12`, `mixup_alpha=0.2`, `cutmix_alpha=1.0`, `label_smoothing=0.1`, AdamW, `freeze_epochs=2`, `finetune_epochs=35`, `lr_head=7e-4`, `lr_backbone=5e-5`, `batch_size=32`, `weight_decay=5e-5` | ✅ 已完成：验证 Macro-F1 **≈0.679**、测试 Macro-F1 **≈0.679**，较之前有显著提升 | log: `outputs/logs/resnet50_E3_5.csv`; ckpt: `outputs/checkpoints/E3_5_resnet50_strong_aug_best.pt`; preds: `outputs/predictions/resnet50_E3_5_test.csv` |
 | **E3.6 – 强增强 + Mixup** | 延续 E3.5 成功经验，进一步提高扰动幅度，追求验证 ≥0.70 | `augment=basic`, `randaug_num_ops=3`, `randaug_magnitude=15`, `mixup_alpha=0.3`, `cutmix_alpha=1.0`, `label_smoothing=0.1`, AdamW，`freeze_epochs=2`, `finetune_epochs=35`, `lr_head=8e-4`, `lr_backbone=6e-5`, `weight_decay=3e-5`, `batch_size=32`，`device=cuda`, `num_workers=4` | ✅ 已完成：验证 Macro-F1 **≈0.706**（finetune epoch 14），测试 Macro-F1 **≈0.700**，首次突破 0.70 | log: `outputs/logs/resnet50_E3_6.csv`; ckpt: `outputs/checkpoints/E3_6_resnet50_strong_aug_warmup_best.pt`; preds: `outputs/predictions/resnet50_E3_6_test.csv` |
 | **E3.7 – 强增强 + Warmup/Dropout** | 在 E3.6 基础上引入更强 mixup、warmup、fc Dropout=0.2 | `augment=basic`, `randaug_num_ops=3`, `randaug_magnitude=16`, `mixup_alpha=0.4`, `cutmix_alpha=1.0`, `label_smoothing=0.1`, AdamW，`freeze_epochs=1`, `finetune_epochs=40`, `lr_head=7e-4`, `lr_backbone=4e-5`, `weight_decay=2e-5`, `batch_size=32`, `device=cuda`, `num_workers=4` | ✅ 已完成：验证 Macro-F1 **≈0.693**、测试 Macro-F1 **≈0.671**，相比 E3.6 略有回落，说明过强的正则导致欠拟合 | log: `outputs/logs/resnet50_E3_7.csv`; ckpt: `outputs/checkpoints/E3_7_resnet50_strong_aug_warmup_drop_best.pt`; preds: `outputs/predictions/resnet50_E3_7_test.csv` |
-| **E3.8 – 强增强 + 半暖启动（规划）** | 折中方案：减小 mixup 到 0.25、randaug magnitude=13，恢复 freeze_epochs=2，同时采用 5 epoch warmup + CosineLR，期望在不过度正则的情况下维持 0.70+ | 建议配置：`randaug_num_ops=3`, `randaug_magnitude=13`, `mixup_alpha=0.25`, `cutmix_alpha=1.0`, `label_smoothing=0.1`, AdamW，`freeze_epochs=2`, `finetune_epochs=35`, `warmup_epochs=5`, `lr_head=7.5e-4`, `lr_backbone=5e-5`, `weight_decay=3e-5`, `batch_size=32`, `dropout_fc=0.1` | 待运行 | 目标输出：`outputs/logs/resnet50_E3_8.csv` / `outputs/checkpoints/E3_8_resnet50_strong_aug_warmup_best.pt` / `outputs/predictions/resnet50_E3_8_test.csv` |
+| 
 
 > 每次实验完成后，请把最终验证/测试指标追加到该表中（如 Macro-F1、Top-1 Accuracy），并简要记录训练曲线、Grad-CAM、混淆矩阵等关键可视化的路径。
 
@@ -26,5 +26,5 @@
 - **E3.5（实测）**：RandAugment + Mixup/CutMix + Label Smoothing 的组合显著提升了验证性能（~0.679），证明多重正则方向有效。
 - **E3.6（实测）**：更强的 RandAugment/ Mixup 将验证 Macro-F1 推至 0.706、测试 0.700，标志着 0.70 目标已达成。
 - **E3.7（实测）**：加入 warmup/Dropout 后验证回落到 ~0.693，说明正则过强导致欠拟合。
-- **E3.8（规划）**：准备采用“半暖启动”折衷方案：保留 warmup/Dropout，但降低 RandAugment 幅度与 mixup α，恢复 2 个冻结 epoch，期望回到 0.70+。
+
 
